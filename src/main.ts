@@ -1,17 +1,41 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import {Octokit} from '@octokit/core'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+    const owner = core.getInput('owner', {required: true})
+    const repo = core.getInput('repo', {required: true})
+    const token = core.getInput('token', {required: true})
+    const tag = core.getInput('tag', {required: true})
+    const ref = core.getInput('ref', {required: true})
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const octokit = new Octokit({auth: token})
 
-    core.setOutput('time', new Date().toTimeString())
+    const result = await octokit.request(
+      'GET /repos/{owner}/{repo}/git/ref/{ref}',
+      {
+        owner,
+        repo,
+        ref: `refs/heads/${ref}`
+      }
+    )
+
+    let sha = ref;
+
+    if (result.status == 200 && result.data.ref && result.data.object.type === 'commit') {
+      sha = result.data.object.sha
+    }
+
+    await octokit.request('POST /repos/{owner}/{repo}/git/tags', {
+      owner,
+      repo,
+      tag: `refs/tags/${tag}`,
+      message: `tagger ${tag}`,
+      object: sha,
+      type: 'commit'
+    })
   } catch (error) {
+    core.error(error)
     core.setFailed(error.message)
   }
 }

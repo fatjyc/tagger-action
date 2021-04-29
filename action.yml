@@ -1,11 +1,22 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'tagger-action'
+description: 'Tag commit with a given ref'
+author: 'Jiang Yucheng'
 inputs:
-  milliseconds: # change this
+  owner:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'The github repo owner'
+  repo:
+    required: true
+    description: 'the github repo name'
+  token:
+    required: true
+    description: 'The GITHUB_TOKEN secret'
+  tag:
+    required: true
+    description: 'Tag text'
+  ref:
+    required: true
+    description: 'A given ref'
 runs:
   using: 'node12'
   main: 'dist/index.js'
