@@ -16,23 +16,25 @@ async function run(): Promise<void> {
       {
         owner,
         repo,
-        ref: `refs/heads/${ref}`
+        ref: `heads/${ref}`
       }
     )
 
-    let sha = ref;
+    let sha = ref
 
-    if (result.status == 200 && result.data.ref && result.data.object.type === 'commit') {
+    if (
+      result.status === 200 &&
+      result.data.ref &&
+      result.data.object.type === 'commit'
+    ) {
       sha = result.data.object.sha
     }
 
-    await octokit.request('POST /repos/{owner}/{repo}/git/tags', {
+    await octokit.request('POST /repos/{owner}/{repo}/git/refs', {
       owner,
       repo,
-      tag: `refs/tags/${tag}`,
-      message: `tagger ${tag}`,
-      object: sha,
-      type: 'commit'
+      ref: `refs/tags/${tag}`,
+      sha
     })
   } catch (error) {
     core.error(error)
