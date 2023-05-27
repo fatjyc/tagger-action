@@ -20,7 +20,7 @@ jobs:
         uses: fatjyc/github-tagger@v0.0.1
         with:
           repo: 'repo'
-          oowner: 'owner'
+          owner: 'owner'
           token: 'token'
           ref: 'ref'
           tag: 'my_tag'
